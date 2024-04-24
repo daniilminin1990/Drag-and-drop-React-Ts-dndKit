@@ -146,12 +146,12 @@ export const KanbanBoard = () => {
     dispatch(tasksActions.addTask(newTask))
   }
 
-  const deleteTaskHandler = (id: string) => {
-    dispatch(tasksActions.deleteTask(id))
+  const deleteTaskHandler = (taskId: string) => {
+    dispatch(tasksActions.deleteTask({taskId: taskId}))
   }
 
-  const updateTaskHandler = (id: string, content: string) => {
-    dispatch(tasksActions.updateTask({id, content}));
+  const updateTaskHandler = (taskId: string, content: string) => {
+    dispatch(tasksActions.updateTask({taskId: taskId, content}));
   }
   return (
     <div className=" m-auto flex min-h-screen w-full items-center overflow-x-auto overflow-y-hidden px-[40px]

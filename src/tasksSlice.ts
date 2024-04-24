@@ -20,12 +20,14 @@ const slice = createSlice({
       console.log('Сколько', action.payload)
       state.tasks = [...state.tasks, action.payload]
     },
-    deleteTask: (state, action: PayloadAction<string>) => {
-      state.tasks = state.tasks.filter(task => task.id !== action.payload)
+    deleteTask: (state, action: PayloadAction<{ taskId: string }>) => {
+      const {taskId} = action.payload
+      state.tasks = state.tasks.filter(task => task.id !== taskId)
     },
-    updateTask: (state, action: PayloadAction<{ id: string, content: string }>) => {
-      const index = state.tasks.findIndex(task => task.id === action.payload.id)
-      state.tasks[index] = {...state.tasks[index], content: action.payload.content}
+    updateTask: (state, action: PayloadAction<{ taskId: string, content: string }>) => {
+      const {taskId, content} = action.payload
+      const index = state.tasks.findIndex(task => task.id === taskId)
+      state.tasks[index] = {...state.tasks[index], content: content}
     },
     moveTask: (state, action: PayloadAction<{ activeTaskId: string, overTaskId: string | null }>) => {
       const {activeTaskId, overTaskId} = action.payload;
