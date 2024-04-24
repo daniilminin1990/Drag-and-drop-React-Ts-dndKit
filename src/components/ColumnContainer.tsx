@@ -18,8 +18,6 @@ interface Props {
 
 export const ColumnContainer = (props: Props) => {
   const {column, deleteColumn, updateColumn, createTask, tasks, deleteTask, updateTask} = props
-  const tasksIds = useMemo(() => tasks.map(task => task.id), [tasks])
-
 
   const [editMode, setEditMode] = useState(false)
 
@@ -84,7 +82,7 @@ export const ColumnContainer = (props: Props) => {
         </button>
       </div>
       <div className="flex flex-grow flex-col gap-4 p-2 overflow-x-hidden overflow-y-auto">
-        <SortableContext items={tasksIds}>
+        <SortableContext items={tasks.map(task => task.id)}>
           {tasks.map(task => {
             return (
               <TaskCard key={task.id} task={task}
