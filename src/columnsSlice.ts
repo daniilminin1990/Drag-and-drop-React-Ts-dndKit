@@ -19,15 +19,15 @@ const slice = createSlice({
     addColumn: (state, action:PayloadAction<Column>) => {
       state.columns.push(action.payload)
     },
-    updateColumn: (state, action: PayloadAction<{ id: string | number, title: string }>) => {
+    updateColumn: (state, action: PayloadAction<{ id: string, title: string }>) => {
       const index = state.columns.findIndex(column => column.id === action.payload.id)
       state.columns[index] = action.payload
     },
-    deleteColumn: (state, action: PayloadAction<string | number>) => {
+    deleteColumn: (state, action: PayloadAction<string>) => {
       const index = state.columns.findIndex(column => column.id === action.payload)
       state.columns.splice(index, 1)
     },
-    moveColumn: (state, action: PayloadAction<{ fromColumnId: string | number, toColumnId: string | number }>) => {
+    moveColumn: (state, action: PayloadAction<{ fromColumnId: string, toColumnId: string }>) => {
       const { fromColumnId, toColumnId } = action.payload
       const fromColumnIndex = state.columns.findIndex(column => column.id === fromColumnId)
       const toColumnIndex = state.columns.findIndex(column => column.id === toColumnId)

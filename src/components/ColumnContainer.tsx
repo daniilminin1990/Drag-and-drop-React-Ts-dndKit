@@ -8,12 +8,12 @@ import {TaskCard} from "./TaskCard";
 
 interface Props {
   column: Column
-  deleteColumn: (id: string | number) => void
-  updateColumn: (id: string | number, title: string) => void
-  createTask: (id: string | number) => void
+  deleteColumn: (id: string) => void
+  updateColumn: (id: string, title: string) => void
+  createTask: (id: string) => void
   tasks: TaskType[]
-  deleteTask: (taskId: string | number) => void
-  updateTask: (taskId: string | number, content: string) => void
+  deleteTask: (taskId: string) => void
+  updateTask: (taskId: string, content: string) => void
 }
 
 export const ColumnContainer = (props: Props) => {

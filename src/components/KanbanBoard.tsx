@@ -42,7 +42,7 @@ export const KanbanBoard = () => {
     dispatch(columnsActions.addColumn(columnToAdd))
   }
 
-  const deleteColumnHandler = (id: string | number) => {
+  const deleteColumnHandler = (id: string) => {
 
     dispatch(columnsActions.deleteColumn(id))
   }
@@ -74,34 +74,43 @@ export const KanbanBoard = () => {
     // 1 сценарий -- Дропаю таску над другой таской.
     const isActiveATask = active.data.current?.type === "Task"
     const isOverATask = over.data.current?.type === "Task"
-
-    if (!isActiveATask) return
-
-    if (isActiveATask && isOverATask) {
-      if (!activeTask) return
-      console.log('isActiveATask && isOverATask')
-      dispatch(tasksActions.moveTask({
-        activeTaskId: activeId,
-        overTaskId: overId
-        // activeTaskId: prevActiveTaskId,
-        // overTaskId: prevOverTaskId
-      }));
-    }
-
-    // 2 сценарий -- Дропаю таску над column
     const isOverAColumn = over.data.current?.type === 'Column'
-    if (isActiveATask && isOverAColumn) {
-      console.log('isActiveATask && isOverAColumn')
-      if (!activeTask) return
-      dispatch(tasksActions.moveTaskAcrossTodos({
-        activeTaskId: activeId,
-        overColumnId: overId,
-      }))
-
-    }
+    //
+    // if (!isActiveATask) return
+    //
+    // if (isActiveATask && isOverATask) {
+    //   if (!activeTask) return
+    //   console.log('isActiveATask && isOverATask')
+    //   dispatch(tasksActions.moveTask({
+    //     activeTaskId: activeId,
+    //     overTaskId: overId
+    //     // activeTaskId: prevActiveTaskId,
+    //     // overTaskId: prevOverTaskId
+    //   }));
+    // }
+    //
+    // // 2 сценарий -- Дропаю таску над column
+    // const isOverAColumn = over.data.current?.type === 'Column'
+    // if (isActiveATask && isOverAColumn) {
+    //   console.log('isActiveATask && isOverAColumn')
+    //   if (!activeTask) return
+    //   dispatch(tasksActions.moveTaskAcrossTodos({
+    //     activeTaskId: activeId,
+    //     overColumnId: overId,
+    //   }))
+    //
+    // }
+    dispatch(tasksActions.moveTaskCombined({
+      activeId: active?.id.toString(),
+      overId: over?.id.toString(),
+      isOverATask: isOverATask,
+      isOverAColumn: isOverAColumn
+    }));
   }
 
   const onDragEndHandler = (event: DragEndEvent) => {
+    setActiveColumn(null)
+    setActiveTask(null)
     // Зануляем active элементы
     const {active, over} = event
     if (!over) return
@@ -112,11 +121,10 @@ export const KanbanBoard = () => {
     if (activeId == overId) return
 
     dispatch(columnsActions.moveColumn({
-      fromColumnId: activeId,
-      toColumnId: overId
+      fromColumnId: activeId.toString(),
+      toColumnId: overId.toString()
     }))
-    setActiveColumn(null)
-    setActiveTask(null)
+
   }
 
 
@@ -125,11 +133,11 @@ export const KanbanBoard = () => {
       activationConstraint: {distance: 3},
     })
   )
-  const updateColumnHandler = (id: string | number, title: string) => {
+  const updateColumnHandler = (id: string, title: string) => {
     dispatch(columnsActions.updateColumn({id, title}))
   }
 
-  const createTaskHandler = (id: string | number) => {
+  const createTaskHandler = (id: string) => {
     const newTask: TaskType = {
       id: v1(),
       columnId: id,
@@ -138,11 +146,11 @@ export const KanbanBoard = () => {
     dispatch(tasksActions.addTask(newTask))
   }
 
-  const deleteTaskHandler = (id: string | number) => {
+  const deleteTaskHandler = (id: string) => {
     dispatch(tasksActions.deleteTask(id))
   }
 
-  const updateTaskHandler = (id: string | number, content: string) => {
+  const updateTaskHandler = (id: string, content: string) => {
     dispatch(tasksActions.updateTask({id, content}));
   }
   return (

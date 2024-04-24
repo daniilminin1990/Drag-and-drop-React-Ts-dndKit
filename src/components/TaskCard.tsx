@@ -6,8 +6,8 @@ import {CSS} from "@dnd-kit/utilities";
 
 interface Props {
   task: TaskType
-  deleteTask: (taskId: string | number) => void
-  updateTask: (taskId: string | number, content: string) => void
+  deleteTask: (taskId: string) => void
+  updateTask: (taskId: string, content: string) => void
 }
 
 export const TaskCard = (props: Props) => {
