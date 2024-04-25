@@ -14,12 +14,11 @@ const slice = createSlice({
   name: 'tasks',
   initialState: {
     tasks: {
-      [column1]:
-        [
-          {id: v1(), columnId: column1, content: 'Task 1'},
-          {id: v1(), columnId: column1, content: 'Task 2'},
-          {id: v1(), columnId: column1, content: 'Task 3'},
-        ],
+      [column1]: [
+        {id: v1(), columnId: column1, content: 'Task 1'},
+        {id: v1(), columnId: column1, content: 'Task 2'},
+        {id: v1(), columnId: column1, content: 'Task 3'},
+      ],
       [column2]: [
         {id: v1(), columnId: column2, content: 'Task 4'},
         {id: v1(), columnId: column2, content: 'Task 5'},
