@@ -17,6 +17,7 @@ const slice = createSlice({
   },
   reducers: {
     addColumn: (state, action:PayloadAction<Column>) => {
+      console.log('11')
       state.columns.push(action.payload)
     },
     updateColumn: (state, action: PayloadAction<{ id: string, title: string }>) => {

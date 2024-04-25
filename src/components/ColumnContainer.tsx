@@ -5,15 +5,16 @@ import {CSS} from "@dnd-kit/utilities";
 import {useMemo, useState} from "react";
 import {PlusIcon} from "./PlusIcon";
 import {TaskCard} from "./TaskCard";
+import {TaskStateType} from "../tasksSlice";
 
 interface Props {
   column: Column
   deleteColumn: (id: string) => void
   updateColumn: (id: string, title: string) => void
   createTask: (id: string) => void
-  tasks: TaskType[]
-  deleteTask: (taskId: string) => void
-  updateTask: (taskId: string, content: string) => void
+  tasks: TaskStateType
+  deleteTask: (colId: string, taskId: string) => void
+  updateTask: (colId: string, taskId: string, content: string) => void
 }
 
 export const ColumnContainer = (props: Props) => {
@@ -29,6 +30,11 @@ export const ColumnContainer = (props: Props) => {
     },
     disabled: editMode
   })
+
+  const tasksIds = useMemo(
+    () => tasks.tasks[column.id] ? tasks.tasks[column.id].map((task) => task.id) : [],
+    [tasks.tasks, column.id]
+  );
 
   const style = {
     transition,
@@ -82,12 +88,14 @@ export const ColumnContainer = (props: Props) => {
         </button>
       </div>
       <div className="flex flex-grow flex-col gap-4 p-2 overflow-x-hidden overflow-y-auto">
-        <SortableContext items={tasks.map(task => task.id)}>
-          {tasks.map(task => {
+        <SortableContext items={tasksIds}>
+          {tasks.tasks[column.id].map(task => {
             return (
               <TaskCard key={task.id} task={task}
                         deleteTask={deleteTask}
-                        updateTask={updateTask}/>
+                        updateTask={updateTask}
+                        colId={column.id}
+              />
             )
           })
           }

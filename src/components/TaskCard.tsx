@@ -6,8 +6,9 @@ import {CSS} from "@dnd-kit/utilities";
 
 interface Props {
   task: TaskType
-  deleteTask: (taskId: string) => void
-  updateTask: (taskId: string, content: string) => void
+  deleteTask: (colId: string, taskId: string) => void
+  updateTask: (colId: string, taskId: string, content: string) => void
+  colId: string
 }
 
 export const TaskCard = (props: Props) => {
@@ -68,7 +69,7 @@ export const TaskCard = (props: Props) => {
            if(e.key === "Enter" && e.shiftKey)
            toggleEditMode()
          }}
-        onChange={e => updateTask(task.id, e.target.value)}
+        onChange={e => updateTask(props.colId, task.id, e.target.value)}
         >
         </textarea>
       </div>)
@@ -100,7 +101,7 @@ export const TaskCard = (props: Props) => {
       {mouseIsOver && <button className='stroke-white absolute right-4 top-1/2-translate-y-1/2
       bg-columnBackgroundColor p-2 rounded opacity-60 hover:opacity-100'
                               onClick={() => {
-                                deleteTask(task.id)
+                                deleteTask(props.colId, task.id)
                               }}>
         <TrashIcon/>
       </button>}

@@ -19,7 +19,7 @@ import {createPortal} from "react-dom";
 import {TaskCard} from "./TaskCard";
 import {useAppDispatch, useAppSelector} from "../store";
 import {columnsActions} from "../columnsSlice";
-import {tasksActions} from "../tasksSlice";
+import {tasksActions, TaskStateType} from "../tasksSlice";
 import {v1} from "uuid";
 import {Rect} from "@dnd-kit/core/dist/utilities";
 import {getIntersectionRatio} from "@dnd-kit/core/dist/utilities/algorithms/rectIntersection";
@@ -28,7 +28,7 @@ import {getIntersectionRatio} from "@dnd-kit/core/dist/utilities/algorithms/rect
 
 export const KanbanBoard = () => {
   const dispatch = useAppDispatch()
-  const tasks = useAppSelector(state => (state.tasks.tasks));
+  const tasks = useAppSelector(state => (state.tasks));
   const columns = useAppSelector(state => state.columns.columns)
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
   const [activeTask, setActiveTask] = useState<TaskType | null>(null);
@@ -67,45 +67,48 @@ export const KanbanBoard = () => {
     const activeId = active.id
     const overId = over.id
 
-    console.log(over)
-
     if (activeId == overId) return
 
     // 1 сценарий -- Дропаю таску над другой таской.
     const isActiveATask = active.data.current?.type === "Task"
     const isOverATask = over.data.current?.type === "Task"
-    const isOverAColumn = over.data.current?.type === 'Column'
-    //
-    // if (!isActiveATask) return
-    //
-    // if (isActiveATask && isOverATask) {
-    //   if (!activeTask) return
-    //   console.log('isActiveATask && isOverATask')
-    //   dispatch(tasksActions.moveTask({
-    //     activeTaskId: activeId,
-    //     overTaskId: overId
-    //     // activeTaskId: prevActiveTaskId,
-    //     // overTaskId: prevOverTaskId
-    //   }));
-    // }
-    //
-    // // 2 сценарий -- Дропаю таску над column
     // const isOverAColumn = over.data.current?.type === 'Column'
-    // if (isActiveATask && isOverAColumn) {
-    //   console.log('isActiveATask && isOverAColumn')
-    //   if (!activeTask) return
-    //   dispatch(tasksActions.moveTaskAcrossTodos({
-    //     activeTaskId: activeId,
-    //     overColumnId: overId,
-    //   }))
-    //
-    // }
-    dispatch(tasksActions.moveTaskCombined({
-      activeId: active?.id.toString(),
-      overId: over?.id.toString(),
-      isOverATask: isOverATask,
-      isOverAColumn: isOverAColumn
-    }));
+
+    if (!isActiveATask) return
+
+    if (isActiveATask && isOverATask && active.data.current?.task?.columnId === over.data.current?.task?.columnId) {
+      if (!activeTask) return
+      console.log('isActiveATask && isOverATask 1')
+      dispatch(tasksActions.moveTask({
+        colId: active.data.current?.task?.columnId.toString(),
+        activeTaskId: activeId.toString(),
+        overTaskId: overId.toString(),
+        // activeTaskId: prevActiveTaskId,
+        // overTaskId: prevOverTaskId
+      }));
+    }
+
+    // 2 сценарий -- Дропаю таску над column
+    const isOverAColumn = over.data.current?.type === 'Column'
+    if (isActiveATask && isOverAColumn) {
+      console.log('isActiveATask && isOverAColumn')
+      if (!activeTask) return
+      dispatch(tasksActions.moveTaskAcrossTodos({
+        colId: active.data.current?.task?.columnId.toString(),
+        activeTaskId: activeId.toString(),
+        overColumnId: overId.toString(),
+      }))
+
+    }
+    // dispatch(tasksActions.moveTaskCombined({
+    //   tasks: tasks,
+    //   activeColId: active.data.current?.task?.id.toString(),
+    //   overColId: over.data.current?.task?.id.toString(),
+    //   activeId: active?.id.toString(),
+    //   overId: over?.id.toString(),
+    //   isOverATask: isOverATask,
+    //   isOverAColumn: isOverAColumn
+    // }));
   }
 
   const onDragEndHandler = (event: DragEndEvent) => {
@@ -137,21 +140,21 @@ export const KanbanBoard = () => {
     dispatch(columnsActions.updateColumn({id, title}))
   }
 
-  const createTaskHandler = (id: string) => {
+  const createTaskHandler = (colId: string) => {
     const newTask: TaskType = {
       id: v1(),
-      columnId: id,
-      content: `Task ${tasks.length + 1}`
+      columnId: colId,
+      content: `Task ${tasks.tasks[colId].length + 1}`
     }
-    dispatch(tasksActions.addTask(newTask))
+    dispatch(tasksActions.addTask({colId, task: newTask}))
   }
 
-  const deleteTaskHandler = (taskId: string) => {
-    dispatch(tasksActions.deleteTask({taskId: taskId}))
+  const deleteTaskHandler = (colId: string, taskId: string) => {
+    dispatch(tasksActions.deleteTask({colId: colId,taskId: taskId}))
   }
 
-  const updateTaskHandler = (taskId: string, content: string) => {
-    dispatch(tasksActions.updateTask({taskId: taskId, content}));
+  const updateTaskHandler = (colId: string, taskId: string, content: string) => {
+    dispatch(tasksActions.updateTask({colId: colId, taskId: taskId, content}));
   }
   return (
     <div className=" m-auto flex min-h-screen w-full items-center overflow-x-auto overflow-y-hidden px-[40px]
@@ -175,7 +178,7 @@ export const KanbanBoard = () => {
                         deleteColumn={deleteColumnHandler}
                         updateColumn={updateColumnHandler}
                         createTask={createTaskHandler}
-                        tasks={tasks.filter((task: TaskType) => task.columnId === column.id)}
+                        tasks={tasks}
                         deleteTask={deleteTaskHandler}
                         updateTask={updateTaskHandler}
                       />
@@ -201,11 +204,11 @@ export const KanbanBoard = () => {
               updateColumn={updateColumnHandler}
               createTask={createTaskHandler}
               deleteTask={deleteTaskHandler}
-              tasks={tasks.filter((task: TaskType) => task.columnId === activeColumn.id)}
+              tasks={tasks}
               updateTask={updateTaskHandler}
             />)}
           {activeTask && (
-            <TaskCard task={activeTask} deleteTask={deleteTaskHandler} updateTask={updateTaskHandler}/>
+            <TaskCard task={activeTask} deleteTask={deleteTaskHandler} updateTask={updateTaskHandler} colId={activeTask.columnId}/>
           )}
         </DragOverlay>, document.body)}
       </DndContext>
