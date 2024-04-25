@@ -32,7 +32,17 @@ export const KanbanBoard = () => {
   const columns = useAppSelector(state => state.columns.columns)
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
   const [activeTask, setActiveTask] = useState<TaskType | null>(null);
-
+  const columnsIds = useMemo(() => columns.map(column => column.id), [columns])
+  const nonAssTasksArray = useMemo(() => {
+    const tasksArray: TaskType[] = [];
+    Object.values(tasks.tasks).forEach(columnTasks => {
+      columnTasks.forEach(task => {
+        tasksArray.push(task);
+      });
+    });
+    return tasksArray;
+  }, [tasks]);
+  console.log(nonAssTasksArray)
 
   const createNewColumnHandler = () => {
     const columnToAdd: Column = {
@@ -83,6 +93,7 @@ export const KanbanBoard = () => {
         colId: active.data.current?.task?.columnId.toString(),
         activeTaskId: activeId.toString(),
         overTaskId: overId.toString(),
+        nonAssTasksArray: nonAssTasksArray
         // activeTaskId: prevActiveTaskId,
         // overTaskId: prevOverTaskId
       }));
@@ -164,7 +175,7 @@ export const KanbanBoard = () => {
         onDragStart={onDragStartHandler}
         onDragEnd={onDragEndHandler}
         onDragOver={onDragOverHandler}
-        collisionDetection={closestCenter}
+        collisionDetection={closestCorners}
       >
         <div className="m-auto flex gap-4">
           <SortableContext items={columns.map(column => column.id)}>

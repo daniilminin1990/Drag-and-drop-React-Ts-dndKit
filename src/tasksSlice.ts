@@ -51,20 +51,31 @@ const slice = createSlice({
         colId: string,
         activeTaskId: string,
         overTaskId: string | null,
+        nonAssTasksArray: TaskType[]
       }>) => {
-        const {colId, activeTaskId, overTaskId} = action.payload;
+        const {colId, activeTaskId, overTaskId, nonAssTasksArray} = action.payload;
         console.log(colId);
 
-        const activeTaskIndex = state.tasks[colId].findIndex(task => task.id === activeTaskId);
-        const overTaskIndex = state.tasks[colId].findIndex(task => task.id === overTaskId);
+        const activeTaskIndex = nonAssTasksArray.findIndex(task => task.id === activeTaskId);
+        const overTaskIndex = nonAssTasksArray.findIndex(task => task.id === overTaskId);
 
 
         if(activeTaskIndex !== -1 && overTaskIndex !== -1) {
           // Удаляем из старого места
-          const activeTask = state.tasks[colId].splice(activeTaskIndex, 1)[0];
-
+          const activeTask = nonAssTasksArray.splice(activeTaskIndex, 1)[0];
           // Вставляем активную задачу на новое место
-          state.tasks[colId].splice(overTaskIndex, 0, activeTask);
+          nonAssTasksArray.splice(overTaskIndex, 0, activeTask);
+          // Создаем новый state, определяем массив colId
+          const colIdArray = [...new Set(nonAssTasksArray.map(task => task.columnId))];
+          const newState: TaskStateType ={
+            tasks: {}
+          } ;
+          colIdArray.forEach(colId => {
+            newState.tasks[colId] = nonAssTasksArray.filter(task => task.columnId === colId) || [];
+          });
+
+          // Заменяем state на новый
+          state.tasks = newState.tasks;
         }
       },
       moveTaskToAnotherTodoOverTask:

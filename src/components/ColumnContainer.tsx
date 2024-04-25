@@ -30,11 +30,12 @@ export const ColumnContainer = (props: Props) => {
     },
     disabled: editMode
   })
-
+  console.log(column.id)
   const tasksIds = useMemo(
-    () => tasks.tasks[column.id] ? tasks.tasks[column.id].map((task) => task.id) : [],
-    [tasks.tasks, column.id]
+    () => tasks.tasks[column.id].map((task) => task.id),
+    [tasks.tasks]
   );
+  console.log(tasksIds)
 
   const style = {
     transition,
