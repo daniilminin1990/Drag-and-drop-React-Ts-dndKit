@@ -42,7 +42,6 @@ export const KanbanBoard = () => {
     });
     return tasksArray;
   }, [tasks]);
-  console.log(nonAssTasksArray)
 
   const createNewColumnHandler = () => {
     const columnToAdd: Column = {
@@ -108,6 +107,7 @@ export const KanbanBoard = () => {
         colId: active.data.current?.task?.columnId.toString(),
         activeTaskId: activeId.toString(),
         overColumnId: overId.toString(),
+        nonAssTasksArray: nonAssTasksArray
       }))
 
     }

@@ -56,8 +56,8 @@ const slice = createSlice({
         const {colId, activeTaskId, overTaskId, nonAssTasksArray} = action.payload;
         console.log(colId);
 
-        const activeTaskIndex = nonAssTasksArray.findIndex(task => task.id === activeTaskId);
-        const overTaskIndex = nonAssTasksArray.findIndex(task => task.id === overTaskId);
+        const activeTaskIndex = state.tasks[colId].findIndex(task => task.id === activeTaskId);
+        const overTaskIndex = state.tasks[colId].findIndex(task => task.id === overTaskId);
 
 
         if(activeTaskIndex !== -1 && overTaskIndex !== -1) {
@@ -71,7 +71,7 @@ const slice = createSlice({
             tasks: {}
           } ;
           colIdArray.forEach(colId => {
-            newState.tasks[colId] = nonAssTasksArray.filter(task => task.columnId === colId) || [];
+            newState.tasks[colId] = nonAssTasksArray.filter(task => task.columnId === colId);
           });
 
           // Заменяем state на новый
@@ -101,15 +101,37 @@ const slice = createSlice({
         (state, action: PayloadAction<{
           colId: string
           activeTaskId: string,
-          overColumnId: string
+          overColumnId: string,
+          nonAssTasksArray: TaskType[]
         }>) => {
-          const {colId, activeTaskId, overColumnId} = action.payload;
-          const taskIndex = state.tasks[colId].findIndex(task => task.id === activeTaskId);
+          const {colId, activeTaskId, overColumnId, nonAssTasksArray} = action.payload;
+          // const taskIndex = state.tasks[colId].findIndex(task => task.id === activeTaskId);
+          //
+          // if (taskIndex < 0) return; // Если не найдена задача с таким ID, ничего не делаем
+          //
+          // // Обновляем columnId задачи на ID колонки, над которой она была отпущена
+          // state.tasks[colId][taskIndex].columnId = overColumnId;
+          const taskIndex = nonAssTasksArray.findIndex(task => task.id === activeTaskId);
+          const taskIndex2 = state.tasks[colId].findIndex(task => task.id === activeTaskId);
 
           if (taskIndex < 0) return; // Если не найдена задача с таким ID, ничего не делаем
 
           // Обновляем columnId задачи на ID колонки, над которой она была отпущена
+          console.log(nonAssTasksArray[taskIndex])
           state.tasks[colId][taskIndex].columnId = overColumnId;
+          // Создаем новый state, определяем массив colId
+          const colIdArray = [...new Set(nonAssTasksArray.map(task => task.columnId))];
+          const newState: TaskStateType ={
+            tasks: {}
+          } ;
+          colIdArray.forEach(colId => {
+            newState.tasks[colId] = nonAssTasksArray.filter(task => task.columnId === colId);
+          });
+
+          // Заменяем state на новый
+          state.tasks = newState.tasks;
+
+
 
         },
       moveTaskCombined:
